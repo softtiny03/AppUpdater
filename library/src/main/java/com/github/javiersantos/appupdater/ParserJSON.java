@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 
 class ParserJSON {
@@ -74,8 +75,27 @@ class ParserJSON {
     }
 
     private JSONObject readJsonFromUrl() throws IOException, JSONException {
-        InputStream is = this.jsonUrl.openStream();
+        
         try {
+
+            HttpURLConnection connection = (HttpURLConnection) this.jsonUrl.openConnection();
+            connection.setInstanceFollowRedirects(false);
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_MOVED_TEMP ||
+                    statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                    statusCode == HttpURLConnection.HTTP_SEE_OTHER ||
+                    statusCode == 307 ||
+                    statusCode == 308) {
+                String redirectUrl = connection.getHeaderField("Location");
+                this.jsonUrl=new URL(redirectUrl)
+                connection = (HttpURLConnection) this.jsonUrl.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.getResponseCode();
+            }
+            //InputStream is = this.jsonUrl.openStream();
+            InputStream is =  connection.getInputStream();
+
+            
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);
