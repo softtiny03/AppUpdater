@@ -75,7 +75,7 @@ class ParserJSON {
     }
 
     private JSONObject readJsonFromUrl() throws IOException, JSONException {
-        
+        InputStream inputStream = null;
         try {
 
             HttpURLConnection connection = (HttpURLConnection) this.jsonUrl.openConnection();
@@ -93,14 +93,16 @@ class ParserJSON {
                 connection.getResponseCode();
             }
             //InputStream is = this.jsonUrl.openStream();
-            InputStream is =  connection.getInputStream();
+            inputStream =  connection.getInputStream();
 
             
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);
         } finally {
-            is.close();
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
     }
 
