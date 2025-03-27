@@ -87,7 +87,7 @@ class ParserJSON {
                     statusCode == 307 ||
                     statusCode == 308) {
                 String redirectUrl = connection.getHeaderField("Location");
-                this.jsonUrl=new URL(redirectUrl)
+                this.jsonUrl=new URL(redirectUrl);
                 connection = (HttpURLConnection) this.jsonUrl.openConnection();
                 connection.setInstanceFollowRedirects(false);
                 connection.getResponseCode();
