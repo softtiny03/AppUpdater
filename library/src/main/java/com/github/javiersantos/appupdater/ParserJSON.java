@@ -91,6 +91,17 @@ class ParserJSON {
                 connection = (HttpURLConnection) this.jsonUrl.openConnection();
                 connection.setInstanceFollowRedirects(false);
                 connection.getResponseCode();
+                if (statusCode == HttpURLConnection.HTTP_MOVED_TEMP ||
+                    statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                    statusCode == HttpURLConnection.HTTP_SEE_OTHER ||
+                    statusCode == 307 ||
+                    statusCode == 308) {
+                    String redirectUrl = connection.getHeaderField("Location");
+                    this.jsonUrl=new URL(redirectUrl);
+                    connection = (HttpURLConnection) this.jsonUrl.openConnection();
+                    connection.setInstanceFollowRedirects(false);
+                    connection.getResponseCode();
+                }
             }
             //InputStream is = this.jsonUrl.openStream();
             inputStream =  connection.getInputStream();
